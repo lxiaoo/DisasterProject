@@ -21,6 +21,7 @@ import pickle
 
 
 def load_data(database_filepath):
+    # 从数据读取数据，包括标签和消息
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('MessagesCat',con=engine)
     X = df.iloc[:,1]
@@ -29,6 +30,7 @@ def load_data(database_filepath):
     return X, y, col_names
 
 def tokenize(text):
+    #处理并标准化每个词汇
     text = re.sub(r"[^a-zA-Z0-9]", " ", text) #去掉标点
     tokens = word_tokenize(text) #分词
     lemmatizer = WordNetLemmatizer() #提取词干
@@ -42,6 +44,7 @@ def tokenize(text):
 
 
 def build_model():
+    #建立模型，并选择预测效果最好的模型
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -57,6 +60,7 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    #把模型预测结果的分数保存到data frame
     y_pred = model.predict(X_test)
     scores = pd.DataFrame(data=None, index=category_names, columns =['accuracy','precision','recall','F1','True_cnt','False_cnt'],dtype='float')
     test_cnt = Y_test.shape[0]
@@ -75,6 +79,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    #保存模型到pickle文件
     with open(model_filepath, "wb") as f:
         pickle.dump(model, f)
 
