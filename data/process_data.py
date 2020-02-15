@@ -4,7 +4,14 @@ from sqlalchemy import create_engine
 import sqlite3
 
 def load_data(messages_filepath, categories_filepath):
-    #1 读取文件&合并
+    """
+    1 读取文件&合并
+    输入参数：
+        messages_filepath: string, 消息文件地址
+        categories_filepath: string, 分类文件地址
+    输出参数：
+        df:包含消息和分类文件信息的dataframe
+    """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     
@@ -13,9 +20,15 @@ def load_data(messages_filepath, categories_filepath):
     
     
 def clean_data(df):
+    """
+    #2 转换categories文件格式
+    输入参数：
+        df: dataframe，包含消息和分类文件信息的dataframe
+    输出参数：
+        df: 对输入参数进行转换，包括转换标题，转换值，去重
+    """
     categories = df['categories']
     
-    #2 转换categories文件格式
     #2.1 转换标题
     categories_id = df['id']
     categories = categories.str.split(";",expand=True)
@@ -38,8 +51,15 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
-    
+    """
     #4 输出
+    输入参数：
+        df: dataframe，清洗过的dataframe
+        database_filename: string, 数据库文件地址
+    输出参数：
+        X: 特征参数
+        y: 分类参数
+    """
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('MessagesCat', con = engine, if_exists='replace', index=False)
     
@@ -51,6 +71,16 @@ def save_data(df, database_filename):
 
 
 def main():
+    """
+    执行函数
+        无输入参数
+        无输出参数
+    执行过程：
+        1. 导入源数据
+        2. 清洗数据
+        3. 保存数据到数据库    
+    
+    """
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
